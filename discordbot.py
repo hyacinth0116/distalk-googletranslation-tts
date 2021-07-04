@@ -145,5 +145,18 @@ async def ヘルプ(ctx):
 {prefix}接続：ボイスチャンネルに接続します。
 {prefix}切断：ボイスチャンネルから切断します。'''
     await ctx.send(message)
-
+@client.command()
+async def connect(ctx):
+    if ctx.author.voice is None: #ユーザーがボイスチャンネルに接続しているか判定
+        await ctx.send('ボイスチャンネルに接続してから呼び出してください。')
+    else:
+        if ctx.guild.voice_client: #botがボイスチャンネルに接続しているか判定
+            if ctx.author.voice.channel == ctx.guild.voice_client.channel: #今botが接続しているボイスチャンネルと同じかどうか判定
+                await ctx.send('接続済みです。')
+            else:
+                await ctx.voice_client.disconnect() #切断
+                await asyncio.sleep(0.5) #connect()コマンドは急いで発動させるとバグる時があるので、ちょっと待つ
+                await ctx.author.voice.channel.connect() #接続
+        else:
+            await ctx.author.voice.channel.connect() #接続
 client.run(token)
